@@ -1,0 +1,108 @@
+body {
+    margin: 0;
+    background: #f9fafb; /* Light gray */
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.back-button {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    color: #555;
+    text-decoration: none;
+    transition: color .2s;
+}
+
+.back-button:hover {
+    color: #000;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #111;
+}
+
+header p {
+    color: #666;
+}
+
+.card {
+    background: white;
+    padding: 32px;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+    width: 350px;
+}
+
+label {
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 6px;
+    display: block;
+}
+
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-bottom: 16px;
+    font-size: 15px;
+}
+
+input:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+.remember-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.forgot {
+    color: #3b82f6;
+    text-decoration: none;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background .2s;
+}
+
+button:hover {
+    background: #1e4ed8;
+}
+
+.signup {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 14px;
+}
+
+.signup a {
+    color: #2563eb;
+    text-decoration: none;
+}

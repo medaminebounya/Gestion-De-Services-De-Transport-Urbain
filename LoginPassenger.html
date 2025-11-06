@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RideRight - Passenger Login</title>
+    <link rel="stylesheet" href="login.css"> <!-- Our CSS -->
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+
+<body>
+    <a href="../index.html" class="back-button">
+        <i data-feather="arrow-left"></i>
+    </a>
+    <!-- <a href="#" class="floating-btn">
+        <i data-feather="user"></i>
+    </a> -->
+    <div class="container">
+        <header>
+            <h1>Passenger Login</h1>
+            <p>Sign in to book your next ride</p>
+        </header>
+
+        <main>
+            <div class="card">
+
+                <form>
+                    <label>Email</label>
+                    <input type="email" required>
+
+                    <label>Password</label>
+                    <input type="password" required>
+
+                    <div class="remember-row">
+                        <div>
+                            <input type="checkbox" id="remember">
+                            <label for="remember">Remember me</label>
+                        </div>
+
+                        <a href="#" class="forgot">Forgot password?</a>
+                    </div>
+
+                    <button type="submit">Sign in</button>
+                </form>
+
+                <div class="signup">
+                    <p>Don't have an account? <a href="#">Sign up</a></p>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        feather.replace();
+    </script>
+</body>
+</html>
