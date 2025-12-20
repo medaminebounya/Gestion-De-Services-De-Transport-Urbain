@@ -1,72 +1,63 @@
 <?php
-include "connection.php";
+session_start();
+require_once "Database.php";
+require_once "Chauffeur.php";
 
-// Get form data
-$prenom = $_POST['prenom'];
-$nom = $_POST['nom'];
-$email = $_POST['email'];
-$password = $_POST['password'];
-$role = $_POST['role'];
+// Initialize OOP objects
+$dbObj = new Database();
+$conn = $dbObj->connect();
+$chauffeurObj = new Chauffeur($conn);
 
-// New fields from the aesthetic form
-$date_naissance = $_POST['date_naissance'];
-$date_permis = isset($_POST['date_permis']) ? $_POST['date_permis'] : null;
-$annee_vehicule = isset($_POST['annee_vehicule']) ? intval($_POST['annee_vehicule']) : null;
+// Prepare data array
+$formData = [
+    'prenom' => $_POST['prenom'],
+    'nom' => $_POST['nom'],
+    'email' => $_POST['email'],
+    'password' => $_POST['password'],
+    'dob' => $_POST['date_naissance'],
+    'role' => $_POST['role'],
+    'license_date' => $_POST['date_permis'],
+    'car_year' => $_POST['annee_vehicule']
+];
 
-// --- BUSINESS RULES VALIDATION --- 
+// 1. VALIDATION using the Class
+$validationErrors = $chauffeurObj->validate($formData);
 
-$today = new DateTime('today');
-
-// 1. Common Age Check: Must be > 18 for both Clients and Chauffeurs 
-$birthDate = new DateTime($date_naissance);
-$age = $birthDate->diff($today)->y;
-
-if ($age < 18) {
-    die("Registration Refused: You must be at least 18 years old.");
+if (!empty($validationErrors)) {
+    $_SESSION['errors'] = $validationErrors;
+    header("Location: ../signupChauffeur.php");
+    exit();
 }
 
-// 2. Specific Chauffeur Checks 
-if ($role === 'chauffeur' || $role === 'bus' || $role === 'taxi') {
+// 2. BUS LINE LOGIC using the Class
+$assignedLine = null;
+if ($formData['role'] === 'bus') {
+    $assignedLine = $chauffeurObj->assignRandomLine();
+    if (!$assignedLine) {
+        $_SESSION['errors']['role'] = "No bus lines available.";
+        header("Location: ../signupChauffeur.php");
+        exit();
+    }
+}
+
+// 3. DATABASE INSERTION
+$passHashed = password_hash($formData['password'], PASSWORD_DEFAULT);
+$sqlUser = "INSERT INTO utilisateur (prenom, nom, email, mot_de_passe, date_naissance) 
+            VALUES ('".$formData['prenom']."', '".$formData['nom']."', '".$formData['email']."', '$passHashed', '".$formData['dob']."')";
+
+if ($conn->query($sqlUser)) {
+    $idUser = $conn->insert_id;
+    $lineValue = $assignedLine ? $assignedLine : "NULL";
     
-    // License Seniority Check: Must be > 2 years 
-    $licenseDate = new DateTime($date_permis);
-    $seniority = $licenseDate->diff($today)->y;
-
-    if ($seniority < 2) {
-        die("Registration Refused: Driver's license must be at least 2 years old.");
-    }
-
-    // Vehicle Year Check: Must be newer than 2015 
-    if ($annee_vehicule <= 2015) {
-        die("Registration Refused: The vehicle must be newer than 2015.");
-    }
-}
-
-// --- DATABASE INSERTION ---
-
-$password_hashed = password_hash($password, PASSWORD_DEFAULT);
-
-// Insert into main utilisateur table
-$sql_user = "INSERT INTO utilisateur (prenom, nom, email, mot_de_passe, date_naissance) 
-             VALUES ('$prenom', '$nom', '$email', '$password_hashed', '$date_naissance')";
-
-if (mysqli_query($conn, $sql_user)) {
-    $id_user = mysqli_insert_id($conn);
-
-    if ($role === 'chauffeur' || $role === 'bus' || $role === 'taxi') {
-        // Insert into chauffeur table with new required fields and 0 points 
-        $sql_chauffeur = "INSERT INTO chauffeur (id_user, type_vehicule, points, annee_vehicule, date_permis) 
-                          VALUES ($id_user, '$role', 0, $annee_vehicule, '$date_permis')";
-        mysqli_query($conn, $sql_chauffeur);
+    $sqlChauffeur = "INSERT INTO chauffeur (id_user, type_vehicule, points, annee_vehicule, date_permis, id_ligne) 
+                     VALUES ($idUser, '".$formData['role']."', 0, ".$formData['car_year'].", '".$formData['license_date']."', $lineValue)";
+    
+    if ($conn->query($sqlChauffeur)) {
+        if ($assignedLine) {
+            $conn->query("UPDATE lignes SET disponible = 0 WHERE id_ligne = $assignedLine");
+        }
+        unset($_SESSION['errors']);
         header("Location: ../LoginChauffeur.php");
-    } else {
-        // Otherwise, they are a regular client
-        mysqli_query($conn, "INSERT INTO client (id_user) VALUES ($id_user)");
-        header("Location: ../LoginPassenger.php");
     }
-} else {
-    echo "Error: " . mysqli_error($conn);
 }
-
 exit();
-?>

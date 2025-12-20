@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,12 +13,13 @@
         <i data-feather="arrow-left"></i>
     </a>
 
-    <div class="card" style="width: 500px;"> <header>
+    <div class="card" style="width: 500px;"> 
+        <header>
             <h1>Chauffeur Sign Up</h1>
             <p>Join the professional driver network</p>
         </header>
 
-        <form action="php/register.php" method="POST" class="form-grid">
+        <form action="php/register.php" method="POST" class="form-grid" novalidate>
             
             <div class="form-group">
                 <label for="prenom">First Name</label>
@@ -36,9 +38,11 @@
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="••••••••" required>
-                <span id="error-password" class="error-text"></span>
-
+                <input type="password" id="password" name="password" placeholder="••••••••" 
+                       class="<?php echo isset($_SESSION['errors']['password']) ? 'input-error' : ''; ?>" required>
+                <?php if(isset($_SESSION['errors']['password'])): ?>
+                    <span class="error-msg"><?php echo $_SESSION['errors']['password']; unset($_SESSION['errors']['password']); ?></span>
+                <?php endif; ?>
             </div>
 
             <div class="form-group">
@@ -48,23 +52,36 @@
                     <option value="bus">Bus</option>
                     <option value="chauffeur">Personnel</option>
                 </select>
+                <?php if(isset($_SESSION['errors']['role'])): ?>
+                    <span class="error-msg"><?php echo $_SESSION['errors']['role']; unset($_SESSION['errors']['role']); ?></span>
+                <?php endif; ?>
             </div>
 
             <div class="form-group">
                 <label for="date_naissance">Date of Birth</label>
-                <input type="date" id="date_naissance" name="date_naissance" required>
-                <span id="error-age" class="error-text"></span>
+                <input type="date" id="date_naissance" name="date_naissance" 
+                       class="<?php echo isset($_SESSION['errors']['age']) ? 'input-error' : ''; ?>" required>
+                <?php if(isset($_SESSION['errors']['age'])): ?>
+                    <span class="error-msg"><?php echo $_SESSION['errors']['age']; unset($_SESSION['errors']['age']); ?></span>
+                <?php endif; ?>
             </div>
 
             <div class="form-group">
                 <label for="annee_vehicule">Vehicle Year</label>
-                <input type="number" id="annee_vehicule" name="annee_vehicule" min="2015" placeholder="2024" required>
-                <span id="error-vehicle" class="error-text"></span>
+                <input type="number" id="annee_vehicule" name="annee_vehicule" placeholder="2024" 
+                       class="<?php echo isset($_SESSION['errors']['vehicle']) ? 'input-error' : ''; ?>" required>
+                <?php if(isset($_SESSION['errors']['vehicle'])): ?>
+                    <span class="error-msg"><?php echo $_SESSION['errors']['vehicle']; unset($_SESSION['errors']['vehicle']); ?></span>
+                <?php endif; ?>
             </div>
 
             <div class="form-group full-width">
                 <label for="date_permis">Driver's License Date</label>
-                <input type="date" id="date_permis" name="date_permis" required>
+                <input type="date" id="date_permis" name="date_permis" 
+                       class="<?php echo isset($_SESSION['errors']['license']) ? 'input-error' : ''; ?>" required>
+                <?php if(isset($_SESSION['errors']['license'])): ?>
+                    <span class="error-msg"><?php echo $_SESSION['errors']['license']; unset($_SESSION['errors']['license']); ?></span>
+                <?php endif; ?>
             </div>
 
             <button type="submit" class="full-width">Register as Driver</button>

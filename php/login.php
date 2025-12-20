@@ -1,65 +1,33 @@
 <?php
-
-// error_reporting(E_ALL);
-// ini_set('display_errors', 1);
-
-// // Debug: show all POST data
-// var_dump($_POST);
-// exit();
-
 session_start();
-include "connection.php";
+require_once "Database.php";
+require_once "User.php";
+
+$dbObj = new Database();
+$conn = $dbObj->connect();
+$userObj = new User($conn);
 
 $email = $_POST['email'];
 $password = $_POST['password'];
-$role = $_POST['role']; // "chauffeur" or "client"
+$role = $_POST['role']; // From the hidden input in your forms
 
-$sql = "SELECT * FROM utilisateur WHERE email='$email'";
-$result = mysqli_query($conn, $sql);
+$result = $userObj->login($email, $password, $role);
 
-if (password_verify($password, $user['mot_de_passe'])) {
+if (is_array($result)) {
+    // Login successful
+    $_SESSION['id_user'] = $result['id_user'];
+    $_SESSION['prenom'] = $result['prenom'];
+    $_SESSION['role'] = $role;
 
-    if ($password === $user['mot_de_passe']) {
-
-        $_SESSION['id_user'] = $user['id_user'];
-        $_SESSION['role'] = $role;
-
-        if ($role === "chauffeur") {
-
-            $check = mysqli_query(
-                $conn,
-                "SELECT * FROM chauffeur WHERE id_user=" . $user['id_user']
-            );
-
-            if (mysqli_num_rows($check) > 0) {
-                header("Location: ../chauffeur/dashboard.php");
-                exit();
-            } else {
-                echo "No chauffeur account found for this user";
-            }
-
-        } elseif ($role === "client") {
-
-            $check = mysqli_query(
-                $conn,
-                "SELECT * FROM client WHERE id_user=" . $user['id_user']
-            );
-
-            if (mysqli_num_rows($check) > 0) {
-                header("Location: ../client/dashboard.php");
-                exit();
-            } else {
-                echo "No client account found for this user";
-            }
-
-        } else {
-            echo "Unknown role selected";
-        }
-
+    // Redirect based on role
+    if ($role === 'chauffeur') {
+        header("Location: ../chauffeur/dashboard.php");
     } else {
-        echo "Wrong password";
+        header("Location: ../client/dashboard.php");
     }
-
 } else {
-    echo "User not found";
+    // Login failed - result contains the error message
+    $_SESSION['login_error'] = $result;
+    header("Location: " . $_SERVER['HTTP_REFERER']);
 }
+exit();
