@@ -17,7 +17,7 @@ $role = $_POST['role']; // "chauffeur" or "client"
 $sql = "SELECT * FROM utilisateur WHERE email='$email'";
 $result = mysqli_query($conn, $sql);
 
-if ($user = mysqli_fetch_assoc($result)) {
+if (password_verify($password, $user['mot_de_passe'])) {
 
     if ($password === $user['mot_de_passe']) {
 

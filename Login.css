@@ -6,7 +6,51 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    overflow-y: hidden;
+    /*overflow-y: hidden;*/
+}
+
+
+.signup, 
+.signup-link {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 14px;
+    color: #64748b; /* Grayish text color */
+}
+
+.signup a,
+.signup-link a {
+    color: #2563eb; /* Blue link color */
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.signup a:hover,
+.signup-link a:hover {
+    text-decoration: underline;
+}
+
+/* New grid layout for cleaner forms */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    gap: 15px; /* Space between columns */
+}
+
+/* Make full-width inputs (like Email) span both columns */
+.full-width {
+    grid-column: span 2;
+}
+
+/* Adjust labels for the grid */
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+
+input[type="hidden"] {
+    display: none;
 }
 
 .sign-in{
@@ -63,6 +107,8 @@ label {
 input[type="email"],
 input[type="password"],
 input[type="text"],
+input[type="date"],
+input[type="number"],
 select {
     width: 100%;
     padding: 12px;
@@ -72,6 +118,19 @@ select {
     font-size: 15px;
     background-color: white;
     box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+.error-text {
+    color: #dc2626;
+    font-size: 12px;
+    margin-top: -15px; 
+    margin-bottom: 15px;
+    display: none; 
+}
+
+input.input-error {
+    border-color: #dc2626;
 }
 
 input:focus {
