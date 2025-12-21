@@ -18,7 +18,7 @@
             <p>Create an account to start riding</p>
         </header>
         <?php session_start(); ?>
-            <form action="php/register.php" method="POST" novalidate>
+            <form action="register.php" method="POST" novalidate>
                 <label for="prenom">First Name</label>
                 <input type="text" id="prenom" name="prenom" placeholder="El Maati" required>
 
@@ -27,6 +27,9 @@
 
                 <label for="email">Email Address</label>
                 <input type="email" id="email" name="email" placeholder="name@mail.com" required>
+
+                <label for="telephone">Téléphone</label>
+                <input type="tel" id="telephone" name="telephone" placeholder="0612345678">
 
                 <label for="password">P assword</label>
                 <input type="password" id="password" name="password" placeholder="••••••••" 
