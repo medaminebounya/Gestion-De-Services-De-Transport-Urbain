@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Choose Transport — Z3ma CTM</title>
+  <link rel="stylesheet" href="Login.css">
+  <link rel="stylesheet" href="css.php">
+  <link rel="stylesheet" href="css/client_select.css">
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" style="width:760px;">
+      <div class="topbar">
+        <div class="brand">Z3ma CTM</div>
+        <form action="php/logout.php" method="POST" style="margin:0">
+          <button type="submit" class="logout">Déconnexion</button>
+        </form>
+      </div>
+
+      <h1>Quel type de transport préférez-vous ?</h1>
+      <p class="lead">Choisissez entre Taxi, Chauffeur privé ou Bus. Cliquez sur une carte puis "Continuer".</p>
+
+      <form id="transportForm" action="client/add_reservation.php" method="GET">
+        <input type="hidden" name="mode" id="modeInput" value="">
+        <div id="selectedNotice" aria-live="polite"></div>
+        <div class="choices" role="list">
+          <div class="card choice float" data-mode="taxi" role="listitem">
+            <div style="display:flex;align-items:center;width:100%">
+              <div class="icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l1-3h3l1 3"></path><path d="M21 11l-1-3h-3l-1 3"></path><rect x="3" y="11" width="18" height="6" rx="2"></rect><path d="M7 17v2"></path><path d="M17 17v2"></path></svg>
+              </div>
+              <div style="margin-left:12px">
+                <div class="title">Taxi</div>
+                <div class="desc">Réservation rapide d'un taxi</div>
+              </div>
+              <div class="badge">Rapide</div>
+            </div>
+          </div>
+
+          <a href="client/select.php?mode=chauffeur" class="card choice float" role="listitem">
+  <div style="display:flex;align-items:center;width:100%">
+    <div class="icon pulse">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l1-3h3l1 3"></path><path d="M21 11l-1-3h-3l-1 3"></path><rect x="3" y="11" width="18" height="6" rx="2"></rect><path d="M7 17v2"></path><path d="M17 17v2"></path></svg>
+    </div>
+    <div style="margin-left:12px">
+      <div class="title">Chauffeur privé</div>
+      <div class="desc">Confort, trajet personnalisé</div>
+    </div>
+    <div class="badge">Confort</div>
+  </div>
+</a>
+
+
+          <div class="card choice float" data-mode="bus" role="listitem">
+            <div style="display:flex;align-items:center;width:100%">
+              <div class="icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><path d="M6 18v2"></path><path d="M18 18v2"></path></svg>
+              </div>
+              <div style="margin-left:12px">
+                <div class="title">Bus</div>
+                <div class="desc">Trajets en commun — économie</div>
+              </div>
+              <div class="badge">Éco</div>
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <script>
+      (function(){
+      const cards = document.querySelectorAll('.card.choice');
+      const modeInput = document.getElementById('modeInput');
+      const notice = document.getElementById('selectedNotice');
+      const form = document.getElementById('transportForm');
+
+      let selected = null;
+      let noticeTimer = null;
+
+            function navigateToTarget(target, mode) {
+              let url = '';
+              if (mode === 'taxi') url = 'client/taxis.php?mode=' + encodeURIComponent(mode);
+              else if (mode === 'bus') url = 'client/Bus--main/dashboard.php?mode=' + encodeURIComponent(mode);
+              else if (mode === 'chauffeur') url = 'client/add_reservation.php?mode=' + encodeURIComponent(mode);
+              else url = 'client/add_reservation.php?mode=' + encodeURIComponent(mode);
+              window.location.href = url;
+            }
+
+      function selectCard(el) {
+        cards.forEach(c => c.classList.remove('selected'));
+        if (!el) {
+          selected = null; modeInput.value = '';
+          form.action = 'client/add_reservation.php';
+          if (notice) { notice.classList.remove('show'); notice.classList.add('hide'); }
+          return;
+        }
+        el.classList.add('selected');
+        const mode = el.dataset.mode;
+        selected = mode;
+        modeInput.value = mode;
+        // set target action depending on mode
+        if (selected === 'taxi') {
+          form.action = 'client/taxis.php';
+        } else {
+          form.action = 'client/add_reservation.php';
+        }
+        // subtle micro-interaction
+        el.animate([{ transform: 'scale(1.02)' }, { transform: 'scale(1)' }], { duration: 220 });
+
+        // show a temporary notice with the selected label
+        if (notice) {
+          const label = el.querySelector('.title') ? el.querySelector('.title').textContent.trim() : selected;
+          notice.textContent = label + ' sélectionné';
+          notice.classList.remove('hide');
+          void notice.offsetWidth; // restart animation
+          notice.classList.add('show');
+          if (noticeTimer) clearTimeout(noticeTimer);
+          noticeTimer = setTimeout(() => { notice.classList.remove('show'); notice.classList.add('hide'); }, 1400);
+        }
+
+        // navigate after a short delay so animation is visible
+        setTimeout(() => navigateToTarget(null, mode), 420);
+      }
+
+      cards.forEach(card => {
+        card.addEventListener('click', () => selectCard(card));
+      });
+
+      // keyboard accessibility: arrow keys to navigate + Enter to confirm
+      let idx = 0;
+      if (cards.length === 0) return;
+      document.addEventListener('keydown', (e) => {
+        if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)) {
+          e.preventDefault();
+          if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') idx = Math.max(0, idx-1);
+          else idx = Math.min(cards.length-1, idx+1);
+          selectCard(cards[idx]);
+        }
+          if (e.key === 'Enter') {
+            const modeToUse = selected || (cards[idx] && cards[idx].dataset && cards[idx].dataset.mode);
+            if (modeToUse) navigateToTarget(null, modeToUse);
+          }
+      });
+    })();
+  </script>
+</body>
+</html>

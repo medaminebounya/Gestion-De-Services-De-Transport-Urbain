@@ -1,4 +1,25 @@
-<?php session_start(); ?>
+<?php
+session_start();
+require_once "Database.php";
+$lines = [];
+try {
+    $db = (new Database())->connect();
+    if ($db) {
+        $has = $db->query("SHOW TABLES LIKE 'lignes'");
+        if ($has && $has->num_rows > 0) {
+            $res = $db->query("SELECT id_ligne, nom_ligne FROM lignes WHERE disponible = 1");
+            if ($res && $res->num_rows > 0) {
+                while ($r = $res->fetch_assoc()) {
+                    $lines[] = $r;
+                }
+            }
+        }
+    }
+} catch (mysqli_sql_exception $e) {
+    // Table might not exist or another DB error occurred — leave $lines empty
+    $lines = [];
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,7 +40,15 @@
             <p>Join the professional driver network</p>
         </header>
 
-        <form action="php/register.php" method="POST" class="form-grid" novalidate>
+        <?php if(!empty($_SESSION['errors'])): ?>
+            <div class="form-errors">
+                <?php foreach($_SESSION['errors'] as $k => $msg): ?>
+                    <div class="error-msg"><?php echo htmlspecialchars($msg); ?></div>
+                <?php endforeach; unset($_SESSION['errors']); ?>
+            </div>
+        <?php endif; ?>
+
+        <form action="register.php" method="POST" class="form-grid" novalidate>
             
             <div class="form-group">
                 <label for="prenom">First Name</label>
@@ -34,6 +63,15 @@
             <div class="form-group full-width">
                 <label for="email">Email Address</label>
                 <input type="email" id="email" name="email" placeholder="driver@mail.com" required>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="telephone">Téléphone</label>
+                <input type="tel" id="telephone" name="telephone" placeholder="0612345678" 
+                       class="<?php echo isset($_SESSION['errors']['telephone']) ? 'input-error' : ''; ?>">
+                <?php if(isset($_SESSION['errors']['telephone'])): ?>
+                    <span class="error-msg"><?php echo $_SESSION['errors']['telephone']; unset($_SESSION['errors']['telephone']); ?></span>
+                <?php endif; ?>
             </div>
 
             <div class="form-group">
@@ -57,6 +95,7 @@
                 <?php endif; ?>
             </div>
 
+          
             <div class="form-group">
                 <label for="date_naissance">Date of Birth</label>
                 <input type="date" id="date_naissance" name="date_naissance" 
@@ -88,10 +127,31 @@
         </form>
 
         <div class="signup-link">
-            <p>Already a driver? <a href="../LoginChauffeur.php">Sign in</a></p>
+            <p>Already a driver? <a href="../LoginChauffeur.html">Sign in</a></p>
         </div>
     </div>
 
     <script>feather.replace();</script>
+    <script>
+        (function(){
+            var role = document.getElementById('role');
+            var lineGroup = document.getElementById('line-group');
+            var lineSelect = document.getElementById('id_ligne');
+            function toggle() {
+                if (!role) return;
+                if (role.value === 'bus') {
+                    lineGroup.style.display = 'block';
+                    if (lineSelect) lineSelect.setAttribute('required','required');
+                } else {
+                    lineGroup.style.display = 'none';
+                    if (lineSelect) lineSelect.removeAttribute('required');
+                }
+            }
+            if (role) {
+                role.addEventListener('change', toggle);
+                toggle();
+            }
+        })();
+    </script>
 </body>
 </html>
