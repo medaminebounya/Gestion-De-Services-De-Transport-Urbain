@@ -50,7 +50,7 @@ class Chauffeur {
     }
 
     /**
-     * BUS LINE ASSIGNMENT (Chapitre 4: CRUD/Read)
+     * BUS LINE ASSIGNMENT
      */
     public function assignRandomLine() {
         $query = "SELECT id_ligne FROM lignes WHERE disponible = 1 ORDER BY RAND() LIMIT 1";

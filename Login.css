@@ -1,6 +1,6 @@
 body {
     margin: 0;
-    background: #f9fafb; /* Light gray */
+    background: #f9fafb;
     font-family: 'Inter', sans-serif;
     display: flex;
     justify-content: center;
@@ -15,12 +15,12 @@ body {
     text-align: center;
     margin-top: 24px;
     font-size: 14px;
-    color: #64748b; /* Grayish text color */
+    color: #64748b;
 }
 
 .signup a,
 .signup-link a {
-    color: #2563eb; /* Blue link color */
+    color: #2563eb; 
     text-decoration: none;
     font-weight: 600;
 }
@@ -30,19 +30,17 @@ body {
     text-decoration: underline;
 }
 
-/* New grid layout for cleaner forms */
 .form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Two equal columns */
-    gap: 15px; /* Space between columns */
+    grid-template-columns: 1fr 1fr; 
+    gap: 15px; 
 }
 
-/* Make full-width inputs (like Email) span both columns */
 .full-width {
     grid-column: span 2;
 }
 
-/* Adjust labels for the grid */
+
 .form-group {
     display: flex;
     flex-direction: column;
