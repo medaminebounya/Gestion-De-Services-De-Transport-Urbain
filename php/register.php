@@ -61,29 +61,13 @@ if ($stmt->execute()) {
     if ($formData['role'] !== 'client') {
         // Differentiate between bus and other drivers (taxi / personnel)
         if ($formData['role'] === 'bus') {
-            // If a line was selected in the form, validate it's available
-            if ($formData['id_ligne'] !== null) {
-                $chk = $conn->prepare("SELECT id_ligne FROM lignes WHERE id_ligne = ? AND disponible = 1");
-                $chk->bind_param("i", $formData['id_ligne']);
-                $chk->execute();
-                $res = $chk->get_result();
-                if ($res && $res->num_rows > 0) {
-                    $lineValue = $formData['id_ligne'];
-                } else {
-                    $_SESSION['errors']['line'] = "La ligne sélectionnée n'est pas disponible.";
-                    header("Location: " . $_SERVER['HTTP_REFERER']);
-                    exit();
-                }
-            } else {
-                // No selection: try to assign a random available line
+            // No selection: try to assign a random available line
                 $assignedLine = $chauffeurObj->assignRandomLine();
                 if ($assignedLine === null) {
                     $_SESSION['errors']['line'] = "Aucune ligne disponible pour le bus. Réessayez plus tard.";
                     header("Location: " . $_SERVER['HTTP_REFERER']);
                     exit();
                 }
-                $lineValue = $assignedLine;
-            }
         } else {
             // taxi or personnel: no line required
             $lineValue = null;
@@ -153,10 +137,17 @@ if ($stmt->execute()) {
                 // ignore update errors — we still consider registration successful
             }
 
-            // commit transaction and redirect
+            // commit transaction
             $conn->commit();
             unset($_SESSION['errors']);
-            header("Location: ../LoginChauffeur.html?success=1");
+
+            // START OF CHANGES: LOG USER IN AND REDIRECT
+            $_SESSION['id_user'] = $idUser;
+            $_SESSION['prenom'] = $formData['prenom'];
+            $_SESSION['role'] = 'chauffeur'; // Aligned with your dashboard security check
+            
+            header("Location: ../chauffeur/dashboard.php");
+            // END OF CHANGES
         } else {
             $_SESSION['errors']['db'] = "Erreur lors de l'enregistrement du chauffeur: " . ($stmtC->error ?? $conn->error);
             $conn->rollback();

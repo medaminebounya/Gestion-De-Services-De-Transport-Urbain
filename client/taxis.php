@@ -28,7 +28,7 @@ if (count($drivers) > 2) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Taxi — Z3ma CTM</title>
+  <title>Gestion de trafic urbain</title>
   <link rel="stylesheet" href="../css/common.css">
   <link rel="stylesheet" href="../css/taxis.css">
   <meta http-equiv="refresh" content="20">

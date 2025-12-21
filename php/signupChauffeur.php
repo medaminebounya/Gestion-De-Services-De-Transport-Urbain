@@ -67,7 +67,7 @@ try {
 
             <div class="form-group full-width">
                 <label for="telephone">Téléphone</label>
-                <input type="tel" id="telephone" name="telephone" placeholder="0612345678" 
+                <input type="telephone" id="telephone" name="telephone" placeholder="0612345678" 
                        class="<?php echo isset($_SESSION['errors']['telephone']) ? 'input-error' : ''; ?>">
                 <?php if(isset($_SESSION['errors']['telephone'])): ?>
                     <span class="error-msg"><?php echo $_SESSION['errors']['telephone']; unset($_SESSION['errors']['telephone']); ?></span>

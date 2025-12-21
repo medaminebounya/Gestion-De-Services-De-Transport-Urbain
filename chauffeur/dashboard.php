@@ -3,10 +3,9 @@ session_start();
 require_once "../php/Database.php";
 require_once "../php/Chauffeur.php";
 
-/* Hadchi Prod
-
+// Redirect unauthorized users to index.html
 if (!isset($_SESSION['id_user']) || $_SESSION['role'] !== 'chauffeur') {
-    header("Location: ../LoginChauffeur.php");
+    header("Location: ../index.html");
     exit();
 }
 
@@ -24,10 +23,10 @@ $stmt->bind_param("i", $_SESSION['id_user']);
 $stmt->execute();
 $data = $stmt->get_result()->fetch_assoc();
 $rank = $chauffeurObj->getRank($data['points']);
-*/
+
 
 // Hadchi Test
-
+/*
 $data = [
     'prenom' => "Ahmed",
     'nom' => "Alami",
@@ -38,7 +37,7 @@ $data = [
 ];
 $chauffeurObj = new Chauffeur(null); 
 $rank = $chauffeurObj->getRank($data['points']);
-
+*/
 ?>
 
 <!DOCTYPE html>
@@ -59,7 +58,7 @@ $rank = $chauffeurObj->getRank($data['points']);
         <a href="#" class="nav-item">Paramètres</a>-->
         
         <div style="margin-top: auto;">
-            <a href="../logout.php" class="nav-item" style="color: var(--danger);">Sign Out</a>
+            <a href="../php/logout.php" class="nav-item" style="color: var(--danger);">Sign Out</a>
         </div>
     </nav>
 
@@ -99,8 +98,10 @@ $rank = $chauffeurObj->getRank($data['points']);
 
         <div class="requests-container">
             <div class="card">
-                <h3 style="margin-top: 0; margin-bottom: 20px;">Courses Disponibles</h3>
-                <iframe src="requests.php"></iframe>
+                <h3 style="margin-top: 0; margin-bottom: 20px;">
+                    <?php echo ($data['type_vehicule'] === 'bus') ? "Ma Ligne de Bus" : "Courses Disponibles"; ?>
+                </h3>
+                <iframe src="request.php" style="width: 100%; height: 300px; border: none;"></iframe>
             </div>
         </div>
     </main>

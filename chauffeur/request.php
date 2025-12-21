@@ -1,26 +1,79 @@
 <?php
-require_once "../php/Database.php";
-$conn = (new Database())->connect();
+session_start();
+require_once "../client/Bus--main/connection.php"; 
+$db = new Connection();
+$conn = $db->getConnection();
 
-$query = "SELECT * FROM trajet WHERE id_chauffeur IS NULL ORDER BY RAND() LIMIT 1";
-$res = $conn->query($query);
-$trajet = $res->fetch_assoc();
+// 1. Force use of the seeded database
+$conn->select_db("transport_urbain"); 
+
+if (!isset($_SESSION['id_user'])) { exit("Non autorisé"); }
+
+$userId = $_SESSION['id_user'];
+
+// 2. Identify the driver
+$stmt = $conn->prepare("SELECT type_vehicule, id_ligne FROM chauffeur WHERE id_user = ?");
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$driver = $stmt->get_result()->fetch_assoc();
 ?>
-<link rel="stylesheet" href="../Login.css">
-<div style="padding: 15px; border: 1px dashed #ccc; border-radius: 8px; text-align: center;">
-    <?php if ($trajet): ?>
-        <h4>Nouveau Trajet Détecté!</h4>
-        <p>De: <strong><?php echo $trajet['point_depart']; ?></strong></p>
-        <p>À: <strong><?php echo $trajet['point_arrivee']; ?></strong></p>
-        <p>Distance: <?php echo $trajet['distance']; ?> KM</p>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="../Login.css">
+</head>
+<body>
+
+<div class="info-card">
+    <?php if ($driver['type_vehicule'] === 'bus'): ?>
+        <h4 style="color: #2563eb; margin-top: 0;">Itinéraire de ma Ligne (Bus ID: <?= htmlspecialchars($driver['id_ligne']) ?>)</h4>
         
-        <form action="handle_trajet.php" method="POST">
-            <input type="hidden" name="id_trajet" value="<?php echo $trajet['id_trajet']; ?>">
-            <button name="choice" value="accept" class="btn-primary" style="background: #10b981;">Accepter</button>
-            <button name="choice" value="refuse" class="btn-primary" style="background: #ef4444; margin-left: 10px;">Refuser</button>
-        </form>
+        <?php
+        // DEFINE THE QUERY FIRST
+        $sql = "SELECT a.nom_arret, ba.ordre_passage 
+                FROM Bus_Arret ba 
+                INNER JOIN Arret a ON ba.arret_id = a.arret_id 
+                WHERE ba.bus_id = " . intval($driver['id_ligne']) . " 
+                ORDER BY ba.ordre_passage";
+        
+        // RUN THE QUERY
+        $res = $conn->query($sql);
+        
+        // CHECK RESULTS
+        if ($res && $res->num_rows > 0):
+            while ($stop = $res->fetch_assoc()): ?>
+                <div class="bus-item">
+                    <strong>Arrêt <?= $stop['ordre_passage'] ?>:</strong> <?= htmlspecialchars($stop['nom_arret']) ?>
+                </div>
+            <?php endwhile; ?>
+            <a href="../dashboard_map.php" target="_parent" style="display:inline-block; margin-top:10px; color: #2563eb; font-weight: bold; text-decoration: none;">→ Voir sur la Carte Live</a>
+        <?php else: ?>
+            <p style="color: #666;">Aucun arrêt trouvé pour cette ligne.</p>
+            <p style="font-size: 11px; color: #999;">Note: Vérifiez que id_ligne dans votre table chauffeur correspond à un bus_id dans la table Bus.</p>
+        <?php endif; ?>
+
     <?php else: ?>
-        <p>En attente de nouvelles demandes...</p>
-        <button onclick="location.reload()" style="padding: 5px 10px; cursor:pointer;">Actualiser</button>
+        <?php
+        $taxiSql = "SELECT * FROM trajet WHERE id_chauffeur IS NULL ORDER BY RAND() LIMIT 1";
+        $taxiRes = $conn->query($taxiSql);
+        $trajet = ($taxiRes) ? $taxiRes->fetch_assoc() : null;
+
+        if ($trajet): ?>
+            <div class="taxi-box">
+                <h4>Nouvelle Course</h4>
+                <p>De: <strong><?= htmlspecialchars($trajet['point_depart']) ?></strong></p>
+                <p>À: <strong><?= htmlspecialchars($trajet['point_arrivee']) ?></strong></p>
+                <form action="handle_trajet.php" method="POST">
+                    <input type="hidden" name="id_trajet" value="<?= $trajet['id_trajet'] ?>">
+                    <button class="btn">Accepter la course</button>
+                </form>
+            </div>
+        <?php else: ?>
+            <p style="text-align:center; color:#888;">Aucune course disponible...</p>
+            <button onclick="location.reload()" style="display:block; margin: 0 auto; font-size: 12px;">Rafraîchir</button>
+        <?php endif; ?>
     <?php endif; ?>
 </div>
+</body>
+</html>

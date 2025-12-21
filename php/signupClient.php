@@ -29,7 +29,7 @@
                 <input type="email" id="email" name="email" placeholder="name@mail.com" required>
 
                 <label for="telephone">Téléphone</label>
-                <input type="tel" id="telephone" name="telephone" placeholder="0612345678">
+                <input type="telephone" id="telephone" name="telephone" placeholder="0612345678">
 
                 <label for="password">P assword</label>
                 <input type="password" id="password" name="password" placeholder="••••••••" 

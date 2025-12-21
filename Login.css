@@ -30,19 +30,17 @@ body {
     text-decoration: underline;
 }
 
-/* New grid layout for cleaner forms */
 .form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Two equal columns */
-    gap: 15px; /* Space between columns */
+    grid-template-columns: 1fr 1fr;
+    gap: 15px; 
 }
 
-/* Make full-width inputs (like Email) span both columns */
+
 .full-width {
     grid-column: span 2;
 }
 
-/* Adjust labels for the grid */
 .form-group {
     display: flex;
     flex-direction: column;
@@ -109,6 +107,7 @@ input[type="password"],
 input[type="text"],
 input[type="date"],
 input[type="number"],
+input[type="telephone"],
 select {
     width: 100%;
     padding: 12px;
@@ -119,6 +118,36 @@ select {
     background-color: white;
     box-sizing: border-box;
     font-family: 'Inter', sans-serif;
+}
+
+.info-card { 
+    padding: 15px; border: 1px dashed #ccc; border-radius: 8px;
+}
+.bus-item { 
+    background: #f9fafb; 
+    padding: 10px; 
+    margin-bottom: 8px; 
+    border-left: 4px solid #2563eb; 
+    font-size: 14px;
+}
+.taxi-box {
+    border: 1px dashed #ccc;
+    padding: 15px;
+    text-align: center;
+    border-radius: 8px;
+}
+.btn {
+background: #10b981;
+color: white;
+border: none;
+padding: 8px 15px;
+border-radius: 5px;
+cursor: pointer;
+}
+
+.btn-map { 
+    display: block; width: 100%; text-align: center; background: #2563eb; 
+    color: white; padding: 10px; border-radius: 6px; text-decoration: none; margin-top: 10px;
 }
 
 .error-msg { 
