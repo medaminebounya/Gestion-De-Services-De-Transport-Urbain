@@ -3,9 +3,8 @@ session_start();
 require_once "../php/Database.php";
 require_once "../php/Chauffeur.php";
 
-/* // ==========================================
-// MODE: DATABASE (Uncomment this for Production)
-// ==========================================
+/* Hadchi Prod
+
 if (!isset($_SESSION['id_user']) || $_SESSION['role'] !== 'chauffeur') {
     header("Location: ../LoginChauffeur.php");
     exit();
@@ -27,9 +26,8 @@ $data = $stmt->get_result()->fetch_assoc();
 $rank = $chauffeurObj->getRank($data['points']);
 */
 
-// ==========================================
-// MODE: MOCK (Comment this out for Production)
-// ==========================================
+// Hadchi Test
+
 $data = [
     'prenom' => "Ahmed",
     'nom' => "Alami",
@@ -40,7 +38,7 @@ $data = [
 ];
 $chauffeurObj = new Chauffeur(null); 
 $rank = $chauffeurObj->getRank($data['points']);
-// ==========================================
+
 ?>
 
 <!DOCTYPE html>
